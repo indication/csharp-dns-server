@@ -9,17 +9,15 @@ namespace Dns
     using System;
     using System.IO;
     using System.Net;
-    using System.Threading;
-    using Dns.ZoneProvider.AP;
-    using Ninject;
     using System.Reflection;
+    using System.Threading;
+    using Ninject;
 
     public class Program
     {
         private class Plugins {
-            public Contracts.IDnsCache Cache {get;set;}
+            public Contracts.IDnsCache<IPHostEntry> HostEntryCache {get;set;}
             public ZoneProvider.BaseZoneProvider ZoneProvider {get;set;}
-
             public Contracts.IDnsResolver Resolver {get;set;}
         }
 
@@ -38,11 +36,12 @@ namespace Dns
             // see bindings.cs for configured bindings
             var kernel = new StandardKernel();
             kernel.Load(Assembly.GetExecutingAssembly());
-            plugins.Cache = kernel.Get<Contracts.IDnsCache>();
+            plugins.HostEntryCache = kernel.Get<Contracts.IDnsCache<IPHostEntry>>();
             plugins.Resolver = kernel.Get<Contracts.IDnsResolver>();
             plugins.ZoneProvider = kernel.Get<ZoneProvider.BaseZoneProvider>();
 
             // wire up plugin dependencies
+            plugins.Resolver.SetHostEntryCache(plugins.HostEntryCache);
             plugins.Resolver.SubscribeTo(plugins.ZoneProvider);
 
             // TODO: read zone data and select ZoneProvider from configuration

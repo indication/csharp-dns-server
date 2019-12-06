@@ -18,6 +18,8 @@ namespace Dns.Contracts
 
         void SubscribeTo(IObservable<Zone> zoneProvider);
 
+        void SetHostEntryCache(IDnsCache<IPHostEntry> cacheProvider);
+
         bool TryGetHostEntry(string hostname, ResourceClass resClass, ResourceType resType, out IPHostEntry entry);
     }
 }

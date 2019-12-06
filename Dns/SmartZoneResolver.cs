@@ -24,6 +24,8 @@ namespace Dns
         private Dictionary<string, IAddressDispenser> _zoneMap;
         private DateTime _zoneReload = DateTime.MinValue;
 
+        private IDnsCache<IPHostEntry> hostEntryCache;
+
         public string GetZoneName()
         {
             return this.Zone.Suffix;
@@ -101,8 +103,9 @@ namespace Dns
             if (!this.IsZoneLoaded()) return false;
             if (!hostName.EndsWith(this._zone.Suffix)) return false;
 
-            // lookup locally
+            // lookup keys
             string key = GenerateKey(hostName, resClass, resType);
+
             IAddressDispenser dispenser;
             if (_zoneMap.TryGetValue(key, out dispenser))
             {
@@ -132,6 +135,10 @@ namespace Dns
             }
 
             this._subscription = zoneProvider.Subscribe(this);
+        }
+
+        public void SetHostEntryCache(IDnsCache<IPHostEntry> cacheProvider) {
+            this.hostEntryCache = cacheProvider;
         }
 
         private string GenerateKey(ZoneRecord record)

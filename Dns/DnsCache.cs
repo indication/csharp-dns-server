@@ -10,24 +10,24 @@ namespace Dns
     using Microsoft.Extensions.Caching.Memory;
     using Dns.Contracts;
 
-    public class DnsCache : IDnsCache
+    public class DnsCache<T> : IDnsCache<T>
     {
         private readonly MemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
 
-        byte[] IDnsCache.Get(string key)
+        T IDnsCache<T>.Get(string key)
         {
-            byte[] entry;
-            if (_cache.TryGetValue(key, out entry)) {
-                return entry;
+            T data;
+            if (_cache.TryGetValue(key, out data)) {
+                return data;
             }
 
-            return null;
+            return default(T);
         }
 
-        void IDnsCache.Set(string key, byte[] bytes, int ttlSeconds)
+        void IDnsCache<T>.Set(string key, T data, int ttlSeconds)
         {
             var cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(DateTimeOffset.Now + TimeSpan.FromSeconds(ttlSeconds));
-            _cache.Set(key, bytes, cacheEntryOptions);
+            _cache.Set(key, data, cacheEntryOptions);
         }
     }
 }

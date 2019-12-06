@@ -1,6 +1,7 @@
 
 namespace Dns
 {
+    using System.Net;
     using Ninject.Modules;  
     using ZoneProvider.AP;
 
@@ -8,7 +9,7 @@ namespace Dns
     {
         public override void Load()
         {
-            Bind<Contracts.IDnsCache>().To<DnsCache>();
+            Bind<Contracts.IDnsCache<IPHostEntry>>().To<DnsCache<IPHostEntry>>();
             Bind<Contracts.IDnsResolver>().To<SmartZoneResolver>();
             Bind<ZoneProvider.BaseZoneProvider>().ToConstant(new APZoneProvider("data\\machineinfo.csv", ".foo.bar"));
         }

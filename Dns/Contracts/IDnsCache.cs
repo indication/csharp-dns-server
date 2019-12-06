@@ -6,10 +6,10 @@
 
 namespace Dns.Contracts
 {
-    public interface IDnsCache
+    public interface IDnsCache<T>
     {
-        byte[] Get(string key);
+        T Get(string key);
 
-        void Set(string key, byte[] bytes, int ttlSeconds);
+        void Set(string key, T data, int ttlSeconds);
     }
 }

@@ -11,14 +11,14 @@ namespace DnsTest
     {
         [Fact]
         public void Test1() {
-            Dns.Contracts.IDnsCache cache = new Dns.DnsCache();
+            Dns.Contracts.IDnsCache<byte[]> cache = new Dns.DnsCache<byte[]>();
             var invalidKeyResult = cache.Get("invalidTestKey");
             Xunit.Assert.Null(invalidKeyResult);
         }
 
         [Fact]
         public void Test2() {
-            Dns.Contracts.IDnsCache cache = new Dns.DnsCache();
+            Dns.Contracts.IDnsCache<byte[]> cache = new Dns.DnsCache<byte[]>();
 
             string key = "sampleCacheKey";
             byte[] data = Encoding.ASCII.GetBytes("test");
