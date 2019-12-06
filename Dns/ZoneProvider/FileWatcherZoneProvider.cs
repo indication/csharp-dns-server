@@ -72,7 +72,7 @@ namespace Dns.ZoneProvider
         }
 
         /// <summary>Start watching and generating zone files</summary>
-        public void Start()
+        public override void Start()
         {
             // fire first zone generation event on startup
             this._timer.Change(TimeSpan.FromSeconds(3), Timeout.InfiniteTimeSpan);
@@ -88,7 +88,7 @@ namespace Dns.ZoneProvider
         }
 
         /// <summary>Stop watching</summary>
-        public void Stop()
+        public override void Stop()
         {
             this._fileWatcher.EnableRaisingEvents = false;
         }

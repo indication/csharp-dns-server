@@ -55,5 +55,9 @@ namespace Dns.ZoneProvider
                 remainingRetries--;
             }
         }
+
+        public abstract void Start();
+
+        public abstract void Stop();
     }
 }

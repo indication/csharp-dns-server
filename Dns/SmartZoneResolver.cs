@@ -14,7 +14,7 @@ namespace Dns
     using System.Threading;
     using Dns.Contracts;
 
-    public class SmartZoneResolver : IObserver<Zone>, IDnsResolver
+    public class SmartZoneResolver : IDnsResolver
     {
         private long _hits;
         private long _misses;

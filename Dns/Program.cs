@@ -11,34 +11,50 @@ namespace Dns
     using System.Net;
     using System.Threading;
     using Dns.ZoneProvider.AP;
+    using Ninject;
+    using System.Reflection;
 
     public class Program
     {
-        private static APZoneProvider _zoneProvider; // reloads Zones from machineinfo.csv changes
-        private static SmartZoneResolver _zoneResolver; // resolver and delegated lookup for unsupported zones;
+        private class Plugins {
+            public Contracts.IDnsCache Cache {get;set;}
+            public ZoneProvider.BaseZoneProvider ZoneProvider {get;set;}
+
+            public Contracts.IDnsResolver Resolver {get;set;}
+        }
+
         private static DnsServer _dnsServer; // resolver and delegated lookup for unsupported zones;
         private static HttpServer _httpServer;
         private static ManualResetEvent _exit = new ManualResetEvent(false);
         private static ManualResetEvent _exitTimeout = new ManualResetEvent(false);
 
+        private static Plugins plugins = new Plugins();
+
         public static void Main(string[] args)
         {
             Console.CancelKeyPress += Console_CancelKeyPress;
-            
+
+            // Ninject DI controlled
+            // see bindings.cs for configured bindings
+            var kernel = new StandardKernel();
+            kernel.Load(Assembly.GetExecutingAssembly());
+            plugins.Cache = kernel.Get<Contracts.IDnsCache>();
+            plugins.Resolver = kernel.Get<Contracts.IDnsResolver>();
+            plugins.ZoneProvider = kernel.Get<ZoneProvider.BaseZoneProvider>();
+
+            // wire up plugin dependencies
+            plugins.Resolver.SubscribeTo(plugins.ZoneProvider);
+
             // TODO: read zone data and select ZoneProvider from configuration
-            _zoneProvider = new APZoneProvider("data\\machineinfo.csv", ".foo.bar");
-            _zoneResolver = new SmartZoneResolver();
             _dnsServer = new DnsServer();
             _httpServer = new HttpServer();
 
-            _zoneResolver.SubscribeTo(_zoneProvider);
-
-            _dnsServer.Initialize(_zoneResolver);
+            _dnsServer.Initialize(plugins.Resolver);
             _httpServer.Initialize("http://+:8080/");
             _httpServer.OnProcessRequest += _httpServer_OnProcessRequest;
             _httpServer.OnHealthProbe += _httpServer_OnHealthProbe;
 
-            _zoneProvider.Start();
+            plugins.ZoneProvider.Start();
             _dnsServer.Start();
             _httpServer.Start();
 
@@ -46,7 +62,7 @@ namespace Dns
 
             _httpServer.Stop();
             _dnsServer.Stop();
-            _zoneProvider.Stop();
+            plugins.ZoneProvider.Stop();
 
             _exitTimeout.Set();
         }
@@ -63,7 +79,7 @@ namespace Dns
                 context.Response.Headers.Add("Content-Type","text/html");
                 using (TextWriter writer = context.Response.OutputStream.CreateWriter())
                 {
-                    _zoneResolver.DumpHtml(writer);
+                    plugins.Resolver.DumpHtml(writer);
                 }
             }
             else if (rawUrl == "/dump/httpserver")
@@ -87,7 +103,8 @@ namespace Dns
                 context.Response.Headers.Add("Content-Type", "text/html");
                 using (TextWriter writer = context.Response.OutputStream.CreateWriter())
                 {
-                    _httpServer.DumpHtml(writer);
+                    // TODO: Implement Zone Provider dump
+                    //plugins.ZoneProvider.DumpHtml(writer);
                 }
             }
         }
