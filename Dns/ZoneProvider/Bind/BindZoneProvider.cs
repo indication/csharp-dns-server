@@ -39,5 +39,9 @@ namespace Dns.ZoneProvider.Bind
         {
             throw new NotImplementedException();
         }
+
+        public override void DumpHtml(System.IO.TextWriter writer) {
+            throw new NotImplementedException();
+        }
     }
 }

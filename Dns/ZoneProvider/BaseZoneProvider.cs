@@ -1,10 +1,11 @@
 namespace Dns.ZoneProvider
 {
     using System;
+    using System.IO;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public abstract class BaseZoneProvider : IObservable<Zone>, IDisposable
+    public abstract class BaseZoneProvider : IObservable<Zone>, IDisposable, Contracts.IHtmlDump
     {
         private readonly List<IObserver<Zone>> _observers = new List<IObserver<Zone>>();
 
@@ -59,5 +60,7 @@ namespace Dns.ZoneProvider
         public abstract void Start();
 
         public abstract void Stop();
+
+        public abstract void DumpHtml(TextWriter writer);
     }
 }

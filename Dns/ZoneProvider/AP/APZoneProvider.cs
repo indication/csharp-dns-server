@@ -6,6 +6,7 @@
 
 namespace Dns.ZoneProvider.AP
 {
+    using System;
     using System.IO;
     using System.Net;
     using System.Linq;
@@ -17,6 +18,8 @@ namespace Dns.ZoneProvider.AP
     public class APZoneProvider : FileWatcherZoneProvider
     {
         private string _zoneSuffix;
+
+        private DateTime _lastGenerated = DateTime.MinValue;
         private uint _serial;
 
         public APZoneProvider(string machineInfoFile, string zoneSuffix) : base(machineInfoFile)
@@ -54,7 +57,15 @@ namespace Dns.ZoneProvider.AP
 
             // increment serial number
             _serial++;
+
+            _lastGenerated = DateTime.Now;
+
             return zone;
+        }
+
+        public override void DumpHtml(TextWriter writer) {
+            writer.WriteLine(String.Format("Filename:{0}",this.Filename));
+            writer.WriteLine(String.Format("Last Updated:{0}",this._lastGenerated));
         }
     }
 }
