@@ -20,10 +20,10 @@ namespace Dns
         public OnRequestHandler OnRequest;
         private Socket _listener;
 
-        public void Initialize(ushort port = 53)
+        public void Initialize(IPAddress addr, ushort port = 53)
         {
             _listener = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            IPEndPoint ep = new IPEndPoint(IPAddress.Any, port);
+            IPEndPoint ep = new IPEndPoint(addr, port);
             _listener.Bind(ep);
         }
 

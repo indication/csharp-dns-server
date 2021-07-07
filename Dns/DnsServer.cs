@@ -32,9 +32,11 @@ namespace Dns
         private ReaderWriterLockSlim _requestResponseMapLock = new ReaderWriterLockSlim();
 
         private ushort port;
+        private IPAddress ipaddr;
 
-        internal DnsServer(ushort port)
+        internal DnsServer(IPAddress addr, ushort port)
         {
+            this.ipaddr = addr;
             this.port = port;
         }
 
@@ -46,7 +48,7 @@ namespace Dns
 
             _udpListener = new UdpListener();
             
-            _udpListener.Initialize(this.port);
+            _udpListener.Initialize(this.ipaddr, this.port);
             _udpListener.OnRequest += ProcessUdpRequest;
 
             _defaultDns = GetDefaultDNS().ToArray();

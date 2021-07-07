@@ -1,4 +1,4 @@
-namespace Dns.Config
+﻿namespace Dns.Config
 {
    public class AppConfig
    {
@@ -20,6 +20,7 @@ namespace Dns.Config
 
    public class DnsListenerOptions
     {
+      public string IPAddress { get; set; }
       public ushort Port { get; set; }
    }
 

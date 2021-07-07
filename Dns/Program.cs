@@ -53,7 +53,11 @@ namespace Dns
             _zoneResolver = new SmartZoneResolver();
             _zoneResolver.SubscribeTo(_zoneProvider);
 
-            _dnsServer = new DnsServer(appConfig.Server.DnsListener.Port);
+            var stripaddr = appConfig.Server.DnsListener.IPAddress;
+            IPAddress ipaddr;
+            if (string.IsNullOrEmpty(stripaddr) || !IPAddress.TryParse(stripaddr, out ipaddr))
+                ipaddr = IPAddress.Any;
+            _dnsServer = new DnsServer(ipaddr, appConfig.Server.DnsListener.Port);
 
             _httpServer = new HttpServer();
 
